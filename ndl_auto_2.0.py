@@ -50,29 +50,46 @@ def main():
 			os.chdir("..")
 
 def gettitle(soup): #get title and volume of book
-	#title = soup.find("dt",text=re.compile("(title)")).findNext("dd").contents[0].lstrip()
-	#if soup.find("dt",text=re.compile("(volume)")):
-	#	volume = soup.find("dt",text=re.compile("(volume)")).findNext("dd").contents[0].lstrip()
-	#	fulltitle = "{0}_{1}".format(title, volume)
 	if soup.find("dt",text=u"タイトル (title)"):#get title
 		title = soup.find("dt",text=u"タイトル (title)").findNext("dd").contents[0].lstrip()
+		#title = replacebadchars(title) #only needed in Windows
 	else:
 		title = "No.Title"
-	if soup.find("dt",text=u"著者標目 (creator)"):#get author
-		author = soup.find("dt",text=u"著者標目 (creator)").findNext("dd").contents[0].lstrip()
+	if soup.find("dt",text=u"著者 (creator)"):#get author
+		author = soup.find("dt",text=u"著者 (creator)").findNext("dd").contents[0].lstrip()
+		author = replacebadchars(author) #only needed in Windows
 	else:
 		author = "Unknown"
 	if soup.find("dt",text=u"出版年月日(W3CDTF形式) (issued:W3CDTF)"):#get date of publication
 		date = soup.find("dt",text=u"出版年月日(W3CDTF形式) (issued:W3CDTF)").findNext("dd").contents[0].lstrip()
+		date = replacebadchars(date) #only needed in Windows
 	else:
 		date = "Undated"	
 	if soup.find("dt",text=u"巻次、部編番号 (volume)"):#get name of volume (if applicable)
 		volume = soup.find("dt",text=u"巻次、部編番号 (volume)").findNext("dd").contents[0].lstrip()
-		fulltitle = "{0} ({1}) {2}, {3}".format(author, date, title, volume)
+		volume = replacebadchars(volume) #only needed in Windows
+		fulltitle = "{0} ({1}) {2}, {3}".format(author, date, title, volume) #format of fulltitle with volume information
 	else:
 		volume = ""
-		fulltitle = "{0} ({1}) {2}".format(author, date, title)
+		fulltitle = "{0} ({1}) {2}".format(author, date, title) #format of fulltitle without volume information
 	return(title, volume, fulltitle)
+
+def replacebadchars(string): #necessary if running in Windows
+	#for s in string: print(s, s.encode("unicode_escape"))
+	badchars = [r"\\", r"\/", r"\:", r"\*", r"\?", r"\"", r"\<", r"\>", r"\|"]
+	goodchars = ["＼", "／", "：", "＊", "？", "”", "＜", "＞", "｜"]
+	for bad in badchars:
+		string = regex.sub(bad, goodchars[badchars.index(bad)], string)
+	#replace fullwidth numbers and punctuation with halfwidth (comment out next 4 lines if not desired)
+	fullnums = [r"１", r"２", r"３", r"４", r"５", r"６", r"７", r"８", r"９", r"０", u"\u2212", r"[．。]", r"[、，]", r"（", r"）"]
+	halfnums = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", ".", ",", "(", ")"]
+	for num in fullnums:
+		string = regex.sub(num, halfnums[fullnums.index(num)], string)
+	#remove all whitespace (comment out next line if not desired)
+	string = regex.sub(r"\s", "", string)
+	#remove 著 after the author's name
+	string = regex.sub(r"著", "", string)
+	return(string)
 
 def getpages(soup): #get first and last page of volume
 	page = 1 #starting page
