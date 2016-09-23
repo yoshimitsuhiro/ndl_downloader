@@ -2,7 +2,7 @@
 
 from bs4 import BeautifulSoup
 from PyPDF2 import PdfFileMerger, PdfFileReader
-import requests, time, os, sys#, codecs, re
+import requests, time, os, regex#, sys, codecs, re
 
 def main():
 	scale = 1  #scale of images (1 = 100%, 2 = 50%, 4 = 25%, 8 = 12.5%, 16 = 6.25%, 32 = 3.125%)
@@ -52,7 +52,7 @@ def main():
 def gettitle(soup): #get title and volume of book
 	if soup.find("dt",text=u"タイトル (title)"):#get title
 		title = soup.find("dt",text=u"タイトル (title)").findNext("dd").contents[0].lstrip()
-		#title = replacebadchars(title) #only needed in Windows
+		title = replacebadchars(title) #only needed in Windows
 	else:
 		title = "No.Title"
 	if soup.find("dt",text=u"著者 (creator)"):#get author
