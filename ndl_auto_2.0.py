@@ -81,8 +81,8 @@ def replacebadchars(string): #necessary if running in Windows
 	for bad in badchars:
 		string = regex.sub(bad, goodchars[badchars.index(bad)], string)
 	#replace fullwidth numbers and punctuation with halfwidth (comment out next 4 lines if not desired)
-	fullnums = [r"１", r"２", r"３", r"４", r"５", r"６", r"７", r"８", r"９", r"０", u"\u2212", r"[．。]", r"[、，]", r"（", r"）"]
-	halfnums = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", ".", ",", "(", ")"]
+	fullnums = [r"１", r"２", r"３", r"４", r"５", r"６", r"７", r"８", r"９", r"０", u"\u2212", r"[．。]", r"[、，]", r"（", r"）", r"［", r"］"]
+	halfnums = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", ".", ",", "(", ")", r"[", r"]"]
 	for num in fullnums:
 		string = regex.sub(num, halfnums[fullnums.index(num)], string)
 	#remove all whitespace (comment out next line if not desired)
@@ -179,6 +179,8 @@ def estimate(book_ids, waittime, downloadmode, downloadlimit): #estimate time to
 		soup = BeautifulSoup(requests.get(url).text)
 		title, volume, fulltitle = gettitle(soup)
 		page, lastpage = getpages(soup)
+		print("Number of pages in {0} = {1}".format(fulltitle, lastpage))
+		#print(u"Number of pages = {0}".format(next_lastpage)) #for ascii Windows console
 		totalpages += lastpage
 	m, s = divmod((waittime/downloadlimit) * totalpages, 60)
 	h, m = divmod(m, 60)
