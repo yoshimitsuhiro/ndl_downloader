@@ -10,7 +10,7 @@ def main():
 	jpglimit = 1 #number of simultaneous jpg downloads; currently can't go higher than 1 (as of 2014.09.29)
 	pdflimit = 50 #number of simultaneous pdf page downloads; currently can't go higher than 20 (as of 2014.09.29)
 	book_ids = []
-	urllist = "kindai_urls.txt"
+	urllist = "ndl_urls.txt" #file to read urls from
 	with open(urllist, "r") as f:
 		for line in f:
 			url = line.strip()
@@ -86,13 +86,16 @@ def getjpgs(fulltitle, page, lastpage, book_id, scale, waittime, downloadlimit):
 	while page <= lastpage:
 		for i in range(0, downloadlimit):
 			if page < 10:
-				filename = u"{0}_000{1}.jpg".format(fulltitle, page)
+				#filename = u"{0}_000{1}.jpg".format(fulltitle, page) #full filename
+				filename = "000{}.jpg".format(page) #page number only
 			elif page < 100:
-				filename = u"{0}_00{1}.jpg".format(fulltitle, page)
+				#filename = u"{0}_00{1}.jpg".format(fulltitle, page) #full filename
+				filename = "00{}.jpg".format(page) #page number only
 			else:
-				filename = u"{0}_0{1}.jpg".format(fulltitle, page)
+				#filename = u"{0}_0{1}.jpg".format(fulltitle, page) #full filename
+				filename = "0{}.jpg".format(page) #page number only
 			print(u"Now downloading page {0} of {1} of {2}.".format(page, lastpage, fulltitle))
-			#print(u"Now downloading page {0} of {1}.".format(page, lastpage)) #for shitty Windows console
+			#print(u"Now downloading page {0} of {1}.".format(page, lastpage)) #for ascii Windows console
 			payload = {"itemId": "info:ndljp/pid/{}".format(book_id), "contentNo": page, "outputScale": scale}
 			while True:
 				try:
@@ -125,7 +128,7 @@ def getpdfs(fulltitle, page, lastpage, book_id, scale, waittime, downloadlimit):
 		else:
 			filename = u"{0}_0{1}-0{2}.pdf".format(fulltitle, page, lastpdfpage)
 		print(u"Now downloading pages {0} to {1} of {2} in {3}.".format(page, lastpdfpage, lastpage, fulltitle))
-		#print(u"Now downloading pages {0} to {1} of {2}.".format(page, lastpdfpage, lastpage)) #for shitty Windows console
+		#print(u"Now downloading pages {0} to {1} of {2}.".format(page, lastpdfpage, lastpage)) #for ascii Windows console
 		payload = {"pdfOutputRangeType": "R", "pdfPageSize": "", "pdfOutputRanges": "{0}-{1}".format(page, lastpdfpage)}
 		while True:
 			try:
