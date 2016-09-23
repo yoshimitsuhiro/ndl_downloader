@@ -32,8 +32,9 @@ def main():
 		else: print(u"Invalid input! Be sure to enter the full URL including http://.")
 	book_id = int(url.split("/")[-1]) #get book id
 	book_ids.append(book_id)
-	soup = BeautifulSoup(requests.get(url).text)
-	title, volume, fulltitle = gettitle(soup)
+	soup = BeautifulSoup(requests.get(url).text) #get soup of URL
+	title, volume, fulltitle = gettitle(soup) #get title
+	if lastpage == 0: lastpage = getpages(soup) #get last page automatically if not specified
 	if multi_vol == "2": #check to see if multiple volumes exist or not in multi_vol mode
 		next_id = book_id + 1
 		next_url = "http://dl.ndl.go.jp/info:ndljp/pid/{}".format(next_id)
@@ -59,7 +60,7 @@ def main():
 		else: print(u"Invalid input! Input 1 or 2.")
 	if downloadmode == "1": downloadlimit = jpglimit
 	elif downloadmode == "2": downloadlimit = pdflimit
-	if estimate(book_ids, fulltitle, firstpage, lastpage, waittime, downloadmode, downloadlimit, multi_vol): #estimate download time and confirm download
+	if estimate(book_ids, title, fulltitle, firstpage, lastpage, waittime, downloadmode, downloadlimit, multi_vol): #estimate download time and confirm download
 		for i in book_ids:
 			url = "http://dl.ndl.go.jp/info:ndljp/pid/{}".format(i)
 			soup = BeautifulSoup(requests.get(url).text)
@@ -77,8 +78,8 @@ def main():
 					else: print(u"Invalid input! Input yes or no.")
 			os.chdir(fulltitle)
 			#download files
-			if downloadmode == "1":	getjpgs(fulltitle, page, lastpage, i, scale, waittime, downloadlimit) #download volume as jpgs
-			elif downloadmode == "2": getpdfs(fulltitle, page, lastpage, i, scale, waittime, downloadlimit) #download volume as pdf
+			if downloadmode == "1":	getjpgs(fulltitle, firstpage, lastpage, i, scale, waittime, downloadlimit) #download volume as jpgs
+			elif downloadmode == "2": getpdfs(fulltitle, firstpage, lastpage, i, scale, waittime, downloadlimit) #download volume as pdf
 			os.chdir("..")
 			lastpage = 0
 
@@ -88,8 +89,8 @@ def gettitle(soup): #get title and volume of book
 		#title = replacebadchars(title) #only needed in Windows
 	else:
 		title = "No.Title"
-	if soup.find("dt",text=u"著者標目 (creator)"):#get author
-		author = soup.find("dt",text=u"著者標目 (creator)").findNext("dd").contents[0].lstrip()
+	if soup.find("dt",text=u"著者 (creator)"):#get author
+		author = soup.find("dt",text=u"著者 (creator)").findNext("dd").contents[0].lstrip()
 		author = replacebadchars(author) #only needed in Windows
 	else:
 		author = "Unknown"
@@ -120,6 +121,8 @@ def replacebadchars(string): #necessary if running in Windows
 		string = regex.sub(num, halfnums[fullnums.index(num)], string)
 	#remove all whitespace (comment out next line if not desired)
 	string = regex.sub(r"\s", "", string)
+	#remove 著 after the author's name
+	string = regex.sub(r"著", "", string)
 	return(string)
 
 def getpages(soup): #get last page of volume
@@ -131,11 +134,14 @@ def getjpgs(fulltitle, page, lastpage, book_id, scale, waittime, downloadlimit):
 	while page <= lastpage:
 		for i in range(0, downloadlimit):
 			if page < 10:
-				filename = u"{0}_000{1}.jpg".format(fulltitle, page)
+				#filename = u"{0}_000{1}.jpg".format(fulltitle, page) #full filename
+				filename = "000{}.jpg".format(page) #page number only
 			elif page < 100:
-				filename = u"{0}_00{1}.jpg".format(fulltitle, page)
+				#filename = u"{0}_00{1}.jpg".format(fulltitle, page) #full filename
+				filename = "00{}.jpg".format(page) #page number only
 			else:
-				filename = u"{0}_0{1}.jpg".format(fulltitle, page)
+				#filename = u"{0}_0{1}.jpg".format(fulltitle, page) #full filename
+				filename = "0{}.jpg".format(page) #page number only
 			print(u"Now downloading page {0} of {1} of {2}.".format(page, lastpage, fulltitle))
 			#print(u"Now downloading page {0} of {1}.".format(page, lastpage)) #for ascii Windows console
 			payload = {"itemId": "info:ndljp/pid/{}".format(book_id), "contentNo": page, "outputScale": scale}
@@ -197,24 +203,23 @@ def mergepdfs(fulltitle, filenames):
 	for d in filenames:
 		os.remove(d)
 
-def estimate(book_ids, fulltitle, firstpage, lastpage, waittime, downloadmode, downloadlimit, multi_vol): #estimate time to download:
-	if lastpage == 0: lastpage = getpages(soup) #get last page automatically if not specified
+def estimate(book_ids, title, fulltitle, firstpage, lastpage, waittime, downloadmode, downloadlimit, multi_vol): #estimate time to download:
 	totalpages = lastpage - firstpage + 1
-	print(Number of pages in {0} = {1}".format(fulltitle, lastpage))
+	print("Number of pages in {0} = {1}".format(fulltitle, lastpage))
 	if multi_vol == "2":
-		book_id = book_ids[0]
+		book_id = book_ids[0] + 1
 		while True:
-			next_id = book_id + 1
-			next_url = "http://dl.ndl.go.jp/info:ndljp/pid/{}".format(next_id)
+			next_url = "http://dl.ndl.go.jp/info:ndljp/pid/{}".format(book_id)
 			next_soup = BeautifulSoup(requests.get(next_url).text)
 			next_title, next_volume, next_fulltitle = gettitle(next_soup)
 			if title != next_title: break
 			else:
-				book_ids.append(next_id)
+				book_ids.append(book_id)
 				next_lastpage = getpages(next_soup)
 				print("Number of pages in {0} = {1}".format(next_fulltitle, next_lastpage))
 				#print(u"Number of pages = {0}".format(next_lastpage)) #for shitty Windows console
 				totalpages += next_lastpage
+				book_id += 1
 	m, s = divmod((waittime/downloadlimit) * totalpages, 60)
 	h, m = divmod(m, 60)
 	h = int(h)
