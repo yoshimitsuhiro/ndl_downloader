@@ -86,7 +86,7 @@ def main():
 def gettitle(soup): #get title and volume of book
 	if soup.find("dt",text=u"タイトル (title)"):#get title
 		title = soup.find("dt",text=u"タイトル (title)").findNext("dd").contents[0].lstrip()
-		#title = replacebadchars(title) #only needed in Windows
+		title = replacebadchars(title) #only needed in Windows
 	else:
 		title = "No.Title"
 	if soup.find("dt",text=u"著者 (creator)"):#get author
