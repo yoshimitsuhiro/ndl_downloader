@@ -91,6 +91,8 @@ def gettitle(soup): #get title and volume of book
 		title = "No.Title"
 	if soup.find("dt",text=u"著者 (creator)"):#get author
 		author = soup.find("dt",text=u"著者 (creator)").findNext("dd").contents[0].lstrip()
+		author = regex.sub(r"\s+", "", author)
+		if author[-1:] == "著": author = author[:-1]
 		author = replacebadchars(author) #only needed in Windows
 	else:
 		author = "Unknown"
