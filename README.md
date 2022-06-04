@@ -12,10 +12,10 @@ When using this script in Windows, depending on your system locale, you may expe
 
 2022.06.04 Update
 
-Added a combination of a AutoHotkey (ndl-screens.ahk) and python (bordercrop.py) script to download books which are only viewable in browser.
+Added a combination of an AutoHotkey (ndl-screens.ahk) and python (bordercrop.py) script to download books which are only viewable in browser.
 
 The following libraries are required to use the python script: [opencv] (https://pypi.org/project/opencv-python/), [NumPy] (https://numpy.org/).
 
 In order to use the script, first activate ndl-screens.adk. Then open the book you wish to capture in your browser to the first page that you wish to capture. Set your browser to fullscreen mode (F11 in Chrome), then click the fullscreen option on the NDL viewer toolbar, followed by the match to screen size button. You are now ready to start capturing screenshots. Be sure that all popups are disabled before running the script, as everything viewable on the screen other than your cursor will be captured in the screenshots. Next, press the defined hotkey (default setting: Ctrl+F10) to start the script. You will be asked to enter the total number of pages in the book and the page number that you wish to start from (both can be checked from the toolbar). Be sure that the toolbar has fully disappeared before clicking okay to the second prompt. You can stop the script at any time by pressing the defined hotkey again.
 
-Note that it is highly recommended to use a 4K monitor or as close as possible when taking screenshots. While this script should work for any resolution, lower resolutions usually result in blurry or unreadable text. Resolutions above 4K (I have personally tested up to 8K) seem to provide little to no improvement in image quality, so it seems that 4K is the sweet spot.
+Note that it is highly recommended to use a high resolution monitor (or some sort of super resolution option if you have the required graphics card: Google "Nvidia Dynamic Super Resolution" or "AMD Super Virtual Resolution") when taking screenshots. While this script should work for any resolution, lower resolutions, such as 1080p, usually result in blurry or unreadable text. From personal testing, 4K seems to be the sweet spot. Resolutions above 4K (I have personally tested up to 8K) seem to provide little to no improvement in image quality, while greatly increasing file size.
