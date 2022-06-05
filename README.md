@@ -22,3 +22,5 @@ Note that it is highly recommended to use a high resolution monitor (or some sor
 
 Also note that while NDL allows for taking screenshot of all publically available materials, they strictly prohibit sharing such screenshots with others or posting them to social media. Please respect these restrictions when taking screenshots as NDL really has gone above and beyond their duty in providing this vast wealth of materials to the general public. For more details, please see the FAQs below.
 https://www.ndl.go.jp/jp/help/service_digi_individuals.html
+
+Pro tip: For books that have the page-turning arrows overlapping with the page images, you can disable the arrows using Developer Tools (Ctrl+Shift+I in Chrome) and the script will still work just fine!
